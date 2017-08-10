@@ -100,10 +100,6 @@ class RP_Admin_Addons {
 			return;
 		}
 
-		if ( isset( $_GET['install-addon'] ) && 'restaurantpress-services' === $_GET['install-addon'] ) {
-			self::install_restaurantpress_services_addon();
-		}
-
 		$sections        = self::get_sections();
 		$theme           = wp_get_theme();
 		$section_keys    = array_keys( $sections );

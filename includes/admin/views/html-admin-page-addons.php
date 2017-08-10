@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php endforeach; ?>
 		</ul>
 		<br class="clear" />
-		<?php if ( 'featured' !== $current_section && $addons = RP_Admin_Addons::get_section_data( $current_section ) ) : ?>
+		<?php if ( $addons = RP_Admin_Addons::get_section_data( $current_section ) ) : ?>
 			<ul class="products">
 			<?php foreach ( $addons as $addon ) : ?>
 				<li class="product">
@@ -49,11 +49,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php if ( 'FoodHunt' !== $theme['Name'] && 'featured' !== $current_section ) : ?>
 		<div class="foodhunt">
 			<a href="<?php echo esc_url( 'https://themegrill.com/themes/foodhunt/' ); ?>" target="_blank"><img src="<?php echo RP()->plugin_url(); ?>/assets/images/foodhunt.jpg" alt="FoodHunt" /></a>
-			<h2><?php _e( 'Looking for a RestaurantPress theme?', 'woocommerce' ); ?></h2>
-			<p><?php _e( 'We recommend FoodHunt, the <em>official</em> RestaurantPress theme.', 'woocommerce' ); ?></p>
+			<h2><?php _e( 'Looking for a RestaurantPress theme?', 'restaurantpress' ); ?></h2>
+			<p><?php _e( 'We recommend FoodHunt, the <em>official</em> RestaurantPress theme.', 'restaurantpress' ); ?></p>
 			<p><?php _e( 'FoodHunt is an intuitive, flexible and <strong>free</strong> WordPress theme offering deep integration with RestaurantPress and many of the most popular customer-facing extensions.', 'restaurantpress' ); ?></p>
 			<p>
-				<a href="https://themegrill.com/themes/foodhunt/" target="_blank" class="button"><?php _e( 'Read all about it', 'woocommerce' ) ?></a>
+				<a href="https://themegrill.com/themes/foodhunt/" target="_blank" class="button"><?php _e( 'Read all about it', 'restaurantpress' ) ?></a>
 				<a href="<?php echo esc_url( wp_nonce_url( self_admin_url( 'update.php?action=install-theme&theme=foodhunt' ), 'install-theme_foodhunt' ) ); ?>" class="button button-primary"><?php _e( 'Download &amp; install', 'restaurantpress' ); ?></a>
 			</p>
 		</div>
