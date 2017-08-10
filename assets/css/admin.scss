@@ -351,13 +351,15 @@
 
 	.products {
 		overflow: hidden;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
 
 		li {
-			float: left;
-			margin: 0 1em 1em 0 !important;
+			margin: 0 0 1em 0 !important;
 			padding: 0;
 			vertical-align: top;
-			width: 300px;
+			width: 19.5%;
 
 			a {
 				text-decoration: none;
@@ -371,14 +373,16 @@
 					inset 0 1px 0 rgba(255, 255, 255, 0.2),
 					inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 
-				img {
+				.product-image{
+					display: block;
+					background: #ffffff;
+					img {
 					max-width: 258px;
 					max-height: 24px;
 					padding: 17px 20px;
 					display: block;
 					margin: 0;
-					background: #fff;
-					border-right: 260px solid #fff;
+					}
 				}
 
 				img.extension-thumb + h3 {
@@ -1131,7 +1135,11 @@ h2 .restaurantpress-help-tip {
 	margin-top: -5px;
 	margin-left: 0.25em;
 }
-
+@media only screen and (max-width: 1599px) {
+	.rp_addons_wrap .products li {
+		width: 32.5%;		
+	}
+}
 /**
  * Small screen optimisation
  */
@@ -1187,6 +1195,9 @@ h2 .restaurantpress-help-tip {
 			height: 40px;
 		}
 	}
+	.rp_addons_wrap .products li {
+		width: 49%;
+	}
 }
 
 /**
@@ -1195,6 +1206,9 @@ h2 .restaurantpress-help-tip {
 @media only screen and (max-width: 782px) {
 	#restaurantpress-group-data .checkbox {
 		width: 25px;
+	}
+	.rp_addons_wrap .products li {
+		width: 100%;
 	}
 }
 
@@ -1210,6 +1224,10 @@ h2 .restaurantpress-help-tip {
 	.restaurantpress_options_panel fieldset.form-field,
 	.restaurantpress_options_panel p.form-field {
 		padding: 5px 20px !important;
+	}
+
+	.rp_addons_wrap .products li {
+		width: 100%;
 	}
 }
 

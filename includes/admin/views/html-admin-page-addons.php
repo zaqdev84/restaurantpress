@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<li class="product">
 					<a href="<?php echo esc_attr( $addon->link ); ?>">
 						<?php if ( ! empty( $addon->image ) ) : ?>
-							<img src="<?php echo esc_attr( $addon->image ); ?>"/>
+							<span class="product-image"><img src="<?php echo esc_attr( $addon->image ); ?>"/></span>
 						<?php else : ?>
 							<h2><?php echo esc_html( $addon->title ); ?></h2>
 						<?php endif; ?>
