@@ -896,10 +896,7 @@ h2 .restaurantpress-help-tip {
 @media only screen and (max-width: 782px) {
 	#restaurantpress-group-data .checkbox {
 		width: 25px;
-	}
-	.rp_addons_wrap .products li {
-		width: 100%;
-	}
+	}	
 }
 
 @media only screen and (max-width: 500px) {
@@ -915,10 +912,6 @@ h2 .restaurantpress-help-tip {
 	.restaurantpress_options_panel p.form-field {
 		padding: 5px 20px !important;
 	}
-
-	.rp_addons_wrap .products li {
-		width: 100%;
-	}
 }
 
 @media only screen and (max-width: 480px) {
@@ -927,7 +920,7 @@ h2 .restaurantpress-help-tip {
 	.rp_addons_wrap .products li:nth-child(3n),
 	.rp_addons_wrap .products li:nth-child(2n) {
 		width: 100%;
-		margin: 0 0 1% 0 !important;	
+		margin: 0 0 3% 0 !important;	
 	}
 	
 }
