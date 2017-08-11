@@ -22,15 +22,15 @@
 
 	.products {
 		overflow: hidden;
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: space-between;
-
 		li {
-			margin: 0 0 1em 0 !important;
+			margin: 0 1% 1% 0!important;
 			padding: 0;
 			vertical-align: top;
-			width: 19.5%;
+			width: 19.2%;
+			float: left;
+			&:nth-child(5n){
+				margin: 0 0 1% 0!important;
+			}
 
 			a {
 				text-decoration: none;
@@ -808,7 +808,13 @@ h2 .restaurantpress-help-tip {
 }
 @media only screen and (max-width: 1599px) {
 	.rp_addons_wrap .products li {
-		width: 32.5%;		
+		width: 32.66%;		
+	}
+	.rp_addons_wrap .products li:nth-child(5n) {
+		margin: 0 1% 1% 0 !important;
+	}
+	.rp_addons_wrap .products li:nth-child(3n) {
+		margin: 0 0 1% 0 !important;
 	}
 }
 /**
@@ -833,6 +839,19 @@ h2 .restaurantpress-help-tip {
 	}
 }
 
+@media only screen and (max-width: 1120px) {
+	.rp_addons_wrap .products li {
+		width: 49%;	
+		margin: 0 2% 2% 0 !important;	
+	}
+	.rp_addons_wrap .products li:nth-child(5n),
+	.rp_addons_wrap .products li:nth-child(3n) {
+		margin: 0 2% 2% 0 !important;
+	}
+	.rp_addons_wrap .products li:nth-child(2n) {
+		margin: 0 0 2% 0 !important;
+	}
+}
 /**
  * Optimisation for screens 900px and smaller
  */
@@ -902,6 +921,16 @@ h2 .restaurantpress-help-tip {
 	}
 }
 
+@media only screen and (max-width: 480px) {
+	.rp_addons_wrap .products li,
+	.rp_addons_wrap .products li:nth-child(5n),
+	.rp_addons_wrap .products li:nth-child(3n),
+	.rp_addons_wrap .products li:nth-child(2n) {
+		width: 100%;
+		margin: 0 0 1% 0 !important;	
+	}
+	
+}
 /**
  * Select2 elements.
  */
