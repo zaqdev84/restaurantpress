@@ -49,6 +49,10 @@ class RP_Admin_Post_Types {
 		add_filter( 'default_hidden_meta_boxes', array( $this, 'hidden_meta_boxes' ), 10, 2 );
 		add_action( 'post_submitbox_misc_actions', array( $this, 'food_data_visibility' ) );
 
+		if ( ! function_exists( 'duplicate_post_plugin_activation' ) ) {
+			include( 'class-rp-admin-duplicate-food.php' );
+		}
+
 		// Meta-Box Class
 		include_once( dirname( __FILE__ ) . '/class-rp-admin-meta-boxes.php' );
 
