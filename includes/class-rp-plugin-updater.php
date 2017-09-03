@@ -14,14 +14,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! class_exists( 'EDD_License', false ) ) {
-	include_once( dirname( __FILE__ ) . '/libraries/class-edd-license-handler.php' );
-}
-
-if ( ! class_exists( 'EDD_SL_Plugin_Updater', false ) ) {
-	include_once( dirname( __FILE__ ) . '/libraries/class-edd-plugin-updater.php' );
-}
-
 /**
  * RP_Plugin_Updater Class.
  */
@@ -200,7 +192,7 @@ class RP_Plugin_Updater {
 	public function error_notices() {
 		if ( ! empty( $this->errors ) ) {
 			foreach ( $this->errors as $key => $error ) {
-				include( 'views/html-notice-error.php' );
+				include( dirname( __FILE__ ) . '/admin/views/html-notice-error.php' );
 				if ( $key !== 'invalid_key' && did_action( 'all_admin_notices' ) ) {
 					unset( $this->errors[ $key ] );
 				}
@@ -227,7 +219,7 @@ class RP_Plugin_Updater {
 	 */
 	public function plugin_license_form( $plugin_file ) {
 		if ( strtolower( basename( dirname( $plugin_file ) ) ) === strtolower( $this->plugin_slug ) ) {
-			include_once( 'views/html-license-form.php' );
+			include_once( dirname( __FILE__ ) . '/admin/views/html-license-form.php' );
 		}
 	}
 
@@ -311,7 +303,7 @@ class RP_Plugin_Updater {
 	 */
 	public function key_notice() {
 		if ( sizeof( $this->errors ) === 0 && ! get_option( $this->plugin_slug . '_hide_key_notice' ) ) {
-			include( 'views/html-notice-key-unvalidated.php' );
+			include( dirname( __FILE__ ) . '/admin/views/html-notice-key-unvalidated.php' );
 		}
 	}
 
@@ -319,14 +311,14 @@ class RP_Plugin_Updater {
 	 * Activation success notice.
 	 */
 	public function activated_key_notice() {
-		include( 'views/html-notice-key-activated.php' );
+		include( dirname( __FILE__ ) . '/admin/views/html-notice-key-activated.php' );
 	}
 
 	/**
 	 * Dectivation success notice.
 	 */
 	public function deactivated_key_notice() {
-		include( 'views/html-notice-key-deactivated.php' );
+		include( dirname( __FILE__ ) . '/admin/views/html-notice-key-deactivated.php' );
 	}
 }
 
