@@ -1,0 +1,251 @@
+<?php
+/**
+ * Plugin Updater
+ *
+ * Uses https://github.com/easydigitaldownloads/EDD-License-handler to handle plugin licenses.
+ *
+ * @author   WPEverest
+ * @category Admin
+ * @package  RestaurantPress/Admin
+ * @version  1.4.0
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+if ( ! class_exists( 'EDD_License', false ) ) {
+	include_once( dirname( __FILE__ ) . '/libraries/class-edd-license-handler.php' );
+}
+
+if ( ! class_exists( 'EDD_SL_Plugin_Updater', false ) ) {
+	include_once( dirname( __FILE__ ) . '/libraries/class-edd-plugin-updater.php' );
+}
+
+/**
+ * RP_Plugin_Updater Class.
+ */
+class RP_Plugin_Updater {
+
+	/**
+	 * Plugin Name.
+	 * @var string
+	 */
+	private $plugin_name = '';
+
+	/**
+	 * Plugin File.
+	 * @var string
+	 */
+	private $plugin_file = '';
+
+	/**
+	 * Plugin Slug.
+	 * @var string
+	 */
+	private $plugin_slug = '';
+
+	/**
+	 * Plugins data.
+	 * @var array of strings
+	 */
+	private $plugin_data = array();
+
+	/**
+	 * Validation errors.
+	 * @var array of strings
+	 */
+	private $errors = array();
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		$this->init_updates( RP_PLUGIN_FILE );
+	}
+
+	/**
+	 * Init the updater.
+	 */
+	public function init_updates( $file ) {
+		$this->plugin_file = $file;
+		$this->plugin_slug = str_replace( '.php', '', basename( $this->plugin_file ) );
+		$this->plugin_name = basename( dirname( $this->plugin_file ) ) . '/' . $this->plugin_slug . '.php';
+
+		register_activation_hook( $this->plugin_name, array( $this, 'plugin_activation' ), 10 );
+		register_deactivation_hook( $this->plugin_name, array( $this, 'plugin_deactivation' ), 10 );
+
+		add_filter( 'block_local_requests', '__return_false' );
+		add_action( 'admin_init', array( $this, 'admin_init' ) );
+	}
+
+	/**
+	 * Run on admin init.
+	 */
+	public function admin_init() {
+		$this->load_errors();
+
+		add_action( 'shutdown', array( $this, 'store_errors' ) );
+
+		$this->api_key     = get_option( $this->plugin_slug . '_licence_key' );
+		$this->plugin_data = get_plugin_data( $this->plugin_file );
+
+		// Check for plugins update capability.
+		if ( current_user_can( 'update_plugins' ) ) {
+			$this->plugin_requests();
+			$this->plugin_license_view();
+		}
+	}
+
+	/**
+	 * Process plugin requests.
+	 */
+	private function plugin_requests() {
+		if ( ! empty( $_POST[ $this->plugin_slug . '_license_key' ] ) ) {
+			$this->activate_license_request();
+		} elseif ( ! empty( $_GET[ $this->plugin_slug . '_deactivate_license' ] ) ) {
+			$this->deactivate_license_request();
+		} elseif ( ! empty( $_GET[ 'dismiss-' . sanitize_title( $this->plugin_slug ) ] ) ) {
+			update_option( $this->plugin_slug . '_hide_key_notice', 1 );
+		} elseif ( ! empty( $_GET['activated_license'] ) && $_GET['activated_license'] === $this->plugin_slug ) {
+			$this->add_notice( array( $this, 'activated_key_notice' ) );
+		} elseif ( ! empty( $_GET['deactivated_license'] ) && $_GET['deactivated_license'] === $this->plugin_slug ) {
+			$this->add_notice( array( $this, 'deactivated_key_notice' ) );
+		}
+	}
+
+	/**
+	 * Activate a license request.
+	 */
+	private function activate_license_request() {
+		$licence_key = sanitize_text_field( $_POST[ $this->plugin_slug . '_licence_key' ] );
+		$this->activate_licence( $licence_key, $email );
+	}
+
+	/**
+	 * Deactivate a license request
+	 */
+	private function deactivate_licence_request() {
+		$this->deactivate_license();
+		wp_redirect( remove_query_arg( array( 'activated_license', $this->plugin_slug . '_deactivate_license' ), add_query_arg( 'deactivated_license', $this->plugin_slug ) ) );
+		exit;
+	}
+
+	/**
+	 * Display plugin license view.
+	 */
+	private function plugin_license_view() {
+		if ( ! $this->api_key ) {
+			add_action( 'after_plugin_row', array( $this, 'plugin_license_form' ) );
+			// add_action( 'admin_print_styles-plugins.php', array( $this, 'admin_styles' ) );
+			$this->add_notice( array( $this, 'key_notice' ) );
+		} else {
+			add_action( 'after_plugin_row_' . $this->plugin_name, array( $this, 'plugin_update_rows' ), 10, 2 );
+			add_filter( 'plugin_action_links_' . $this->plugin_name, array( $this, 'plugin_action_links' ) );
+		}
+
+		$this->add_notice( array( $this, 'error_notices' ) );
+	}
+
+	/**
+	 * Add notices
+	 */
+	private function add_notice( $callback ) {
+		add_action( 'admin_notices', $callback );
+		add_action( 'network_admin_notices', $callback );
+	}
+
+	/**
+	 * Add an error message
+	 *
+	 * @param string $message Your error message
+	 * @param string $type    Type of error message
+	 */
+	public function add_error( $message, $type = '' ) {
+		if ( $type ) {
+			$this->errors[ $type ] = $message;
+		} else {
+			$this->errors[] = $message;
+		}
+	}
+
+	/**
+	 * Load errors from option
+	 */
+	public function load_errors() {
+		$this->errors = get_option( $this->plugin_slug . '_errors', array() );
+	}
+
+	/**
+	 * Store errors in option
+	 */
+	public function store_errors() {
+		if ( sizeof( $this->errors ) > 0 ) {
+			update_option( $this->plugin_slug . '_errors', $this->errors );
+		} else {
+			delete_option( $this->plugin_slug . '_errors' );
+		}
+	}
+
+	/**
+	 * Output errors
+	 */
+	public function error_notices() {
+		if ( ! empty( $this->errors ) ) {
+			foreach ( $this->errors as $key => $error ) {
+				include( 'views/html-notice-error.php' );
+				if ( $key !== 'invalid_key' && did_action( 'all_admin_notices' ) ) {
+					unset( $this->errors[ $key ] );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Ran on plugin-activation.
+	 */
+	public function plugin_activation() {
+		delete_option( $this->plugin_slug . '_hide_key_notice' );
+	}
+
+	/**
+	 * Ran on plugin-deactivation.
+	 */
+	public function plugin_deactivation() {
+		$this->deactivate_licence();
+	}
+
+	/**
+	 * Show the input form for the license key.
+	 */
+	public function plugin_license_form( $plugin_file ) {
+		if ( strtolower( basename( dirname( $plugin_file ) ) ) === strtolower( $this->plugin_slug ) ) {
+			include_once( 'views/html-license-form.php' );
+		}
+	}
+
+	/**
+	 * Try to activate a license.
+	 */
+	public function activate_license( $license_key ) {
+
+	}
+
+	/**
+	 * Deactivate a license.
+	 */
+	public function deactivate_license( $license_key ) {
+
+	}
+
+	/**
+	 * Show a notice prompting the user to update.
+	 */
+	public function key_notice() {
+		if ( sizeof( $this->errors ) === 0 && ! get_option( $this->plugin_slug . '_hide_key_notice' ) ) {
+			include( 'views/html-notice-key-unvalidated.php' );
+		}
+	}
+}
+
+new RP_Plugin_Updater();
