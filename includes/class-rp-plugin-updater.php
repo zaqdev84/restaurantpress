@@ -148,7 +148,6 @@ class RP_Plugin_Updater {
 			add_action( 'after_plugin_row', array( $this, 'plugin_license_form' ) );
 			$this->add_notice( array( $this, 'key_notice' ) );
 		} else {
-			// add_action( 'after_plugin_row_' . $this->plugin_name, array( $this, 'plugin_update_rows' ), 10, 2 );
 			add_filter( 'plugin_action_links_' . $this->plugin_name, array( $this, 'plugin_action_links' ) );
 		}
 
@@ -308,6 +307,15 @@ class RP_Plugin_Updater {
 	}
 
 	/**
+	 * Show a notice prompting the user to update.
+	 */
+	public function key_notice() {
+		if ( sizeof( $this->errors ) === 0 && ! get_option( $this->plugin_slug . '_hide_key_notice' ) ) {
+			include( 'views/html-notice-key-unvalidated.php' );
+		}
+	}
+
+	/**
 	 * Activation success notice.
 	 */
 	public function activated_key_notice() {
@@ -319,15 +327,6 @@ class RP_Plugin_Updater {
 	 */
 	public function deactivated_key_notice() {
 		include( 'views/html-notice-key-deactivated.php' );
-	}
-
-	/**
-	 * Show a notice prompting the user to update.
-	 */
-	public function key_notice() {
-		if ( sizeof( $this->errors ) === 0 && ! get_option( $this->plugin_slug . '_hide_key_notice' ) ) {
-			include( 'views/html-notice-key-unvalidated.php' );
-		}
 	}
 }
 

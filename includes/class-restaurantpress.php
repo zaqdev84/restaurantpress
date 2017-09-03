@@ -153,9 +153,10 @@ final class RestaurantPress {
 		include_once( RP_ABSPATH . 'includes/abstracts/abstract-rp-food.php' ); // Foods.
 
 		/**
-		 * Plugin Updater.
+		 * Plugin/Addon Updater.
 		 */
 		include_once( RP_ABSPATH . 'includes/class-rp-plugin-updater.php' );
+		include_once( RP_ABSPATH . 'includes/class-rp-addon-updater.php' );
 
 		/**
 		 * Core classes.
