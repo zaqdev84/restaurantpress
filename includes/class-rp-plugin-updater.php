@@ -2,8 +2,6 @@
 /**
  * Plugin Updater
  *
- * Uses https://github.com/easydigitaldownloads/EDD-License-handler to handle plugin licenses.
- *
  * @author   WPEverest
  * @category Admin
  * @package  RestaurantPress/Admin

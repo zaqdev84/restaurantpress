@@ -156,7 +156,6 @@ final class RestaurantPress {
 		 * Plugin/Addon Updater.
 		 */
 		include_once( RP_ABSPATH . 'includes/class-rp-plugin-updater.php' );
-		include_once( RP_ABSPATH . 'includes/class-rp-addon-updater.php' );
 
 		/**
 		 * Core classes.
