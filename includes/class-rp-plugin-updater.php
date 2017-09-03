@@ -266,6 +266,9 @@ class RP_Plugin_Updater {
 			} elseif ( isset( $activate_results['error_code'] ) ) {
 				throw new Exception( $activate_results['error'] );
 
+			} elseif ( isset( $activate_results['license'] ) && 'invalid' === $activate_results['license'] ) {
+				throw new Exception( 'Activation error: The provided license is invalid.' );
+
 			} elseif ( isset( $activate_results['license'] ) && 'valid' === $activate_results['license'] ) {
 				$this->api_key = $license_key;
 				$this->errors  = array();
