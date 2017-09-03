@@ -319,14 +319,22 @@ class RP_Plugin_Updater {
 	 * Activation success notice.
 	 */
 	public function activated_key_notice() {
-		include( dirname( __FILE__ ) . '/admin/views/html-notice-key-activated.php' );
+		if ( $this->api_key ) {
+			include( dirname( __FILE__ ) . '/admin/views/html-notice-key-activated.php' );
+		} else {
+			$this->add_error( 'Connection failed to the License Key API server - possible server issue.', 'restaurantpress' );
+		}
 	}
 
 	/**
 	 * Dectivation success notice.
 	 */
 	public function deactivated_key_notice() {
-		include( dirname( __FILE__ ) . '/admin/views/html-notice-key-deactivated.php' );
+		if ( ! $this->api_key ) {
+			include( dirname( __FILE__ ) . '/admin/views/html-notice-key-deactivated.php' );
+		} else {
+			$this->add_error( 'Connection failed to the License Key API server - possible server issue.', 'restaurantpress' );
+		}
 	}
 }
 
