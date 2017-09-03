@@ -89,7 +89,7 @@ class RP_Plugin_Updater {
 
 		add_action( 'shutdown', array( $this, 'store_errors' ) );
 
-		$this->api_key     = get_option( $this->plugin_slug . '_licence_key' );
+		$this->api_key     = get_option( $this->plugin_slug . '_license_key' );
 		$this->plugin_data = get_plugin_data( $this->plugin_file );
 
 		// Check for plugins update capability.
