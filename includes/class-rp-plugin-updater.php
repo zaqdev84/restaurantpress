@@ -22,6 +22,12 @@ if ( ! class_exists( 'EDD_SL_Plugin_Updater', false ) ) {
 class RP_Plugin_Updater {
 
 	/**
+	 * Plugin ID.
+	 * @var string
+	 */
+	private $plugin_id = '';
+
+	/**
 	 * Plugin Name.
 	 * @var string
 	 */
@@ -52,17 +58,18 @@ class RP_Plugin_Updater {
 	private $errors = array();
 
 	/**
-	 * Constructor.
+	 * Constructor, used if called directly.
 	 */
-	public function __construct() {
-		$this->init_updates( RP_PLUGIN_FILE );
+	public function __construct( $_plugin_id, $_plugin_file ) {
+		$this->init_updates( $_plugin_id, $_plugin_file );
 	}
 
 	/**
 	 * Init the updater.
 	 */
-	public function init_updates( $file ) {
-		$this->plugin_file = $file;
+	public function init_updates( $_plugin_id, $_plugin_file ) {
+		$this->plugin_id   = $_plugin_id;
+		$this->plugin_file = $_plugin_file;
 		$this->plugin_slug = str_replace( '.php', '', basename( $this->plugin_file ) );
 		$this->plugin_name = basename( dirname( $this->plugin_file ) ) . '/' . $this->plugin_slug . '.php';
 
@@ -249,8 +256,8 @@ class RP_Plugin_Updater {
 			}
 
 			$activate_results = json_decode( RP_Plugin_Updater_Key_API::activate( array(
-				'license'   => $license_key,
-				'item_name' => $this->plugin_data['Name'],
+				'license' => $license_key,
+				'item_id' => $this->plugin_id,
 			) ), true );
 
 			if ( false === $activate_results ) {
@@ -285,8 +292,8 @@ class RP_Plugin_Updater {
 	 */
 	public function deactivate_license() {
 		$deactivate_results = json_decode( RP_Plugin_Updater_Key_API::deactivate( array(
-			'license'   => $this->api_key,
-			'item_name' => $this->plugin_data['Name'],
+			'license' => $this->api_key,
+			'item_id' => $this->plugin_id,
 		) ), true );
 
 		if ( isset( $deactivate_results['license'] ) && 'deactivated' === $deactivate_results['license'] ) {
@@ -324,4 +331,4 @@ class RP_Plugin_Updater {
 	}
 }
 
-new RP_Plugin_Updater();
+new RP_Plugin_Updater( 62, RP_PLUGIN_FILE );
