@@ -23,9 +23,9 @@ class RP_Plugin_Updater {
 
 	/**
 	 * Plugin ID.
-	 * @var string
+	 * @var int
 	 */
-	private $plugin_id = '';
+	private $plugin_id = 62;
 
 	/**
 	 * Plugin Name.
@@ -60,15 +60,14 @@ class RP_Plugin_Updater {
 	/**
 	 * Constructor, used if called directly.
 	 */
-	public function __construct( $_plugin_id, $_plugin_file ) {
-		$this->init_updates( $_plugin_id, $_plugin_file );
+	public function __construct( $file ) {
+		$this->init_updates( $file );
 	}
 
 	/**
 	 * Init the updater.
 	 */
-	public function init_updates( $_plugin_id, $_plugin_file ) {
-		$this->plugin_id   = $_plugin_id;
+	public function init_updates( $_plugin_file ) {
 		$this->plugin_file = $_plugin_file;
 		$this->plugin_slug = str_replace( '.php', '', basename( $this->plugin_file ) );
 		$this->plugin_name = basename( dirname( $this->plugin_file ) ) . '/' . $this->plugin_slug . '.php';
@@ -331,4 +330,4 @@ class RP_Plugin_Updater {
 	}
 }
 
-new RP_Plugin_Updater( 62, RP_PLUGIN_FILE );
+new RP_Plugin_Updater( RP_PLUGIN_FILE );
