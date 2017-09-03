@@ -75,7 +75,7 @@ class RP_Plugin_Updater {
 		register_activation_hook( $this->plugin_name, array( $this, 'plugin_activation' ), 10 );
 		register_deactivation_hook( $this->plugin_name, array( $this, 'plugin_deactivation' ), 10 );
 
-		// add_filter( 'block_local_requests', '__return_false' );
+		add_filter( 'block_local_requests', '__return_false' );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 
 		include_once( dirname( __FILE__ ) . '/admin/updater/class-rp-plugin-updater-api.php' );
@@ -127,7 +127,7 @@ class RP_Plugin_Updater {
 	/**
 	 * Deactivate a license request
 	 */
-	private function deactivate_licence_request() {
+	private function deactivate_license_request() {
 		$this->deactivate_license();
 		wp_redirect( remove_query_arg( array( 'activated_license', $this->plugin_slug . '_deactivate_license' ), add_query_arg( 'deactivated_license', $this->plugin_slug ) ) );
 		exit;
@@ -141,7 +141,7 @@ class RP_Plugin_Updater {
 			add_action( 'after_plugin_row', array( $this, 'plugin_license_form' ) );
 			$this->add_notice( array( $this, 'key_notice' ) );
 		} else {
-			add_action( 'after_plugin_row_' . $this->plugin_name, array( $this, 'plugin_update_rows' ), 10, 2 );
+			// add_action( 'after_plugin_row_' . $this->plugin_name, array( $this, 'plugin_update_rows' ), 10, 2 );
 			add_filter( 'plugin_action_links_' . $this->plugin_name, array( $this, 'plugin_action_links' ) );
 		}
 
@@ -226,6 +226,19 @@ class RP_Plugin_Updater {
 	}
 
 	/**
+	 * Display action links in the Plugins list table.
+	 * @param  array $actions
+	 * @return array
+	 */
+	public function plugin_action_links( $actions ) {
+		$new_actions = array(
+			'deactivate_license' => '<a href="' . remove_query_arg( array( 'deactivated_license', 'activated_license' ), add_query_arg( $this->plugin_slug . '_deactivate_license', 1 ) ) . '" class="trash" title="' . esc_attr( __( 'Deactivate License Key', 'restaurantpress' ) ) . '">' . __( 'Deactivate License', 'restaurantpress' ) . '</a>',
+		);
+
+		return array_merge( $actions, $new_actions );
+	}
+
+	/**
 	 * Try to activate a license.
 	 */
 	public function activate_license( $license_key ) {
@@ -242,6 +255,9 @@ class RP_Plugin_Updater {
 
 			if ( false === $activate_results ) {
 				throw new Exception( 'Connection failed to the License Key API server - possible server issue.' );
+
+			} elseif ( isset( $activate_results['error_code'] ) ) {
+				throw new Exception( $activate_results['error'] );
 
 			} elseif ( isset( $activate_results['license'] ) && 'valid' === $activate_results['license'] ) {
 				$this->api_key = $license_key;
@@ -264,8 +280,19 @@ class RP_Plugin_Updater {
 	/**
 	 * Deactivate a license.
 	 */
-	public function deactivate_license( $license_key ) {
+	public function deactivate_license() {
+		$deactivate_results = json_decode( RP_Plugin_Updater_Key_API::deactivate( array(
+			'license'   => $this->api_key,
+			'item_name' => $this->plugin_data['Name'],
+		) ), true );
 
+		if ( isset( $deactivate_results['license'] ) && 'deactivated' === $deactivate_results['license'] ) {
+			delete_option( $this->plugin_slug . '_license_key' );
+			delete_option( $this->plugin_slug . '_errors' );
+			delete_site_transient( 'update_plugins' );
+			$this->errors  = array();
+			$this->api_key = '';
+		}
 	}
 
 	/**
@@ -275,6 +302,13 @@ class RP_Plugin_Updater {
 		if ( sizeof( $this->errors ) === 0 && ! get_option( $this->plugin_slug . '_hide_key_notice' ) ) {
 			include( 'views/html-notice-key-unvalidated.php' );
 		}
+	}
+
+	/**
+	 * Dectivation success notice
+	 */
+	public function deactivated_key_notice() {
+		include( 'views/html-notice-key-deactivated.php' );
 	}
 }
 
