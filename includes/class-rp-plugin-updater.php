@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! class_exists( 'EDD_SL_Plugin_Updater', false ) ) {
+if ( ! class_exists( 'RP_AddOn_Updater', false ) ) {
 	include_once( dirname( __FILE__ ) . '/libraries/class-ess-plugin-updater.php' );
 }
 

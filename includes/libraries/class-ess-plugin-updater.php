@@ -11,12 +11,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * EDD_SL_Plugin_Updater Class.
+ * RP_AddOn_Updater Class.
  */
-class EDD_SL_Plugin_Updater {
+class RP_AddOn_Updater {
 
 	private $api_url     = '';
 	private $api_data    = array();
+	private $addon_id    = '';
 	private $name        = '';
 	private $slug        = '';
 	private $version     = '';
@@ -34,11 +35,11 @@ class EDD_SL_Plugin_Updater {
 	 * @param array   $_api_data    Optional data to send with API calls.
 	 */
 	public function __construct( $_api_url, $_plugin_file, $_api_data = null ) {
-
 		global $edd_plugin_data;
 
 		$this->api_url     = trailingslashit( $_api_url );
 		$this->api_data    = $_api_data;
+		$this->addon_id    = $_addon_id;
 		$this->name        = plugin_basename( $_plugin_file );
 		$this->slug        = basename( $_plugin_file, '.php' );
 		$this->version     = $_api_data['version'];
@@ -61,13 +62,11 @@ class EDD_SL_Plugin_Updater {
 	 * @return void
 	 */
 	public function init() {
-
 		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_update' ) );
 		add_filter( 'plugins_api', array( $this, 'plugins_api_filter' ), 10, 3 );
 		remove_action( 'after_plugin_row_' . $this->name, 'wp_plugin_update_row', 10 );
 		add_action( 'after_plugin_row_' . $this->name, array( $this, 'show_update_notification' ), 10, 2 );
 		add_action( 'admin_init', array( $this, 'show_changelog' ) );
-
 	}
 
 	/**
@@ -84,7 +83,6 @@ class EDD_SL_Plugin_Updater {
 	 * @return array Modified update array with custom plugin data.
 	 */
 	public function check_update( $_transient_data ) {
-
 		global $pagenow;
 
 		if ( ! is_object( $_transient_data ) ) {
@@ -103,22 +101,16 @@ class EDD_SL_Plugin_Updater {
 
 		if ( false === $version_info ) {
 			$version_info = $this->api_request( 'plugin_latest_version', array( 'slug' => $this->slug, 'beta' => $this->beta ) );
-
 			$this->set_version_info_cache( $version_info );
-
 		}
 
 		if ( false !== $version_info && is_object( $version_info ) && isset( $version_info->new_version ) ) {
-
 			if ( version_compare( $this->version, $version_info->new_version, '<' ) ) {
-
 				$_transient_data->response[ $this->name ] = $version_info;
-
 			}
 
 			$_transient_data->last_checked           = current_time( 'timestamp' );
 			$_transient_data->checked[ $this->name ] = $this->version;
-
 		}
 
 		return $_transient_data;
@@ -131,16 +123,11 @@ class EDD_SL_Plugin_Updater {
 	 * @param array   $plugin
 	 */
 	public function show_update_notification( $file, $plugin ) {
-
-		if ( is_network_admin() ) {
+		if ( ! current_user_can( 'update_plugins' ) ) {
 			return;
 		}
 
-		if( ! current_user_can( 'update_plugins' ) ) {
-			return;
-		}
-
-		if( ! is_multisite() ) {
+		if ( ! is_multisite() || is_network_admin() ) {
 			return;
 		}
 
@@ -237,17 +224,8 @@ class EDD_SL_Plugin_Updater {
 	 * @return object $_data
 	 */
 	public function plugins_api_filter( $_data, $_action = '', $_args = null ) {
-
-		if ( $_action != 'plugin_information' ) {
-
+		if ( ( $_action != 'plugin_information' ) || ! isset( $_args->slug ) || ( $_args->slug != $this->slug ) ) {
 			return $_data;
-
-		}
-
-		if ( ! isset( $_args->slug ) || ( $_args->slug != $this->slug ) ) {
-
-			return $_data;
-
 		}
 
 		$to_send = array(
@@ -301,23 +279,6 @@ class EDD_SL_Plugin_Updater {
 		}
 
 		return $_data;
-	}
-
-	/**
-	 * Disable SSL verification in order to prevent download update failures
-	 *
-	 * @param array   $args
-	 * @param string  $url
-	 * @return object $array
-	 */
-	public function http_request_args( $args, $url ) {
-
-		$verify_ssl = $this->verify_ssl();
-		if ( strpos( $url, 'https://' ) !== false && strpos( $url, 'edd_action=package_download' ) ) {
-			$args['sslverify'] = $verify_ssl;
-		}
-		return $args;
-
 	}
 
 	/**
