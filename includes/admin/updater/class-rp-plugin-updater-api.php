@@ -3,7 +3,7 @@
  * Handles the Activation API responses.
  *
  * @class    RP_Plugin_Updater_Key_API
- * @version  1.0.0
+ * @version  1.4.0
  * @package  WPEverest/Admin/Updates
  * @category Admin
  * @author   WPEverest

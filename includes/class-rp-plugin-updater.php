@@ -12,6 +12,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if ( ! class_exists( 'EDD_SL_Plugin_Updater', false ) ) {
+	include_once( dirname( __FILE__ ) . '/libraries/class-ess-plugin-updater.php' );
+}
+
 /**
  * RP_Plugin_Updater Class.
  */
@@ -68,6 +72,7 @@ class RP_Plugin_Updater {
 		add_filter( 'block_local_requests', '__return_false' );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 
+		include_once( dirname( __FILE__ ) . '/admin/updater/class-rp-addon-updater.php' );
 		include_once( dirname( __FILE__ ) . '/admin/updater/class-rp-plugin-updater-api.php' );
 	}
 
