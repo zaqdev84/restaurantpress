@@ -75,8 +75,10 @@ class RP_Plugin_Updater {
 		register_activation_hook( $this->plugin_name, array( $this, 'plugin_activation' ), 10 );
 		register_deactivation_hook( $this->plugin_name, array( $this, 'plugin_deactivation' ), 10 );
 
-		add_filter( 'block_local_requests', '__return_false' );
+		// add_filter( 'block_local_requests', '__return_false' );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
+
+		include_once( dirname( __FILE__ ) . '/admin/updater/class-rp-plugin-updater-api.php' );
 	}
 
 	/**
@@ -231,6 +233,26 @@ class RP_Plugin_Updater {
 
 			if ( empty( $license_key ) ) {
 				throw new Exception( 'Please enter your license key' );
+			}
+
+			$activate_results = json_decode( RP_Plugin_Updater_Key_API::activate( array(
+				'license'   => $license_key,
+				'item_name' => $this->plugin_data['Name'],
+			) ), true );
+
+			echo '<pre>' . print_r( $activate_results['license'], true ) . '</pre>';
+
+			if ( false === $activate_results ) {
+				throw new Exception( 'Connection failed to the License Key API server - possible server issue.' );
+
+			} elseif ( isset( $activate_results['license'] ) && 'valid' === $activate_results['license'] ) {
+				$this->api_key = $license_key;
+				$this->errors  = array();
+
+				update_option( $this->plugin_slug . '_license_key', $this->api_key );
+				delete_option( $this->plugin_slug . '_errors' );
+
+				return true;
 			}
 
 			throw new Exception( 'License could not activate. Please contact support.' );
