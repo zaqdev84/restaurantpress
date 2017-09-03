@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'EDD_SL_Plugin_Updater', false ) ) {
-	include_once( dirname( __FILE__ ) . '/libraries/class-ess-plugin-updater.php' );
+	include_once( dirname( __FILE__ ) . '/libraries/class-edd-plugin-updater.php' );
 }
 
 /**
