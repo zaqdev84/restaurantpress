@@ -240,8 +240,6 @@ class RP_Plugin_Updater {
 				'item_name' => $this->plugin_data['Name'],
 			) ), true );
 
-			echo '<pre>' . print_r( $activate_results['license'], true ) . '</pre>';
-
 			if ( false === $activate_results ) {
 				throw new Exception( 'Connection failed to the License Key API server - possible server issue.' );
 
