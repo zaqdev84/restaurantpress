@@ -13,6 +13,7 @@ $license_key = sanitize_title( $this->plugin_slug . '_license_key' );
 ?>
 <tr id="<?php echo esc_attr( $license_row ); ?>" class="plugin-update-tr rp-license-key-row-tr active">
 	<td colspan="3" class="plugin-update colspanchange">
+		<?php $this->error_notices(); ?>
 		<input type="checkbox" name="checked[]" value="1" checked="checked" style="display: none;">
 		<div class="rp-license-key-row inline">
 			<label for="<?php echo $license_key ?>"><?php _e( 'License:', 'user-registration' ); ?></label>

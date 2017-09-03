@@ -100,8 +100,21 @@ i.mce-i-restaurantpress-shortcodes {
 		}
 	}
 
-	.rp-license-key-row-tr td {
-		padding: 0 !important;
-		border-left: 4px solid #2ea2cc !important;
+	&.rp-license-key-row-tr {
+
+		td {
+			padding: 0 !important;
+			border-left: 4px solid #2ea2cc !important;
+		}
+
+		.rp-updater-license-key-error {
+			margin: 6px 12px 12px !important;
+			padding: 6px 12px !important;
+			line-height: 27px !important;
+
+			p {
+				margin: 0 !important;
+			}
+		}
 	}
 }

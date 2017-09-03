@@ -118,8 +118,8 @@ class RP_Plugin_Updater {
 	 * Activate a license request.
 	 */
 	private function activate_license_request() {
-		$licence_key = sanitize_text_field( $_POST[ $this->plugin_slug . '_licence_key' ] );
-		$this->activate_licence( $licence_key, $email );
+		$license_key = sanitize_text_field( $_POST[ $this->plugin_slug . '_license_key' ] );
+		$this->activate_license( $license_key );
 	}
 
 	/**
@@ -137,14 +137,13 @@ class RP_Plugin_Updater {
 	private function plugin_license_view() {
 		if ( ! $this->api_key ) {
 			add_action( 'after_plugin_row', array( $this, 'plugin_license_form' ) );
-			// add_action( 'admin_print_styles-plugins.php', array( $this, 'admin_styles' ) );
 			$this->add_notice( array( $this, 'key_notice' ) );
 		} else {
 			add_action( 'after_plugin_row_' . $this->plugin_name, array( $this, 'plugin_update_rows' ), 10, 2 );
 			add_filter( 'plugin_action_links_' . $this->plugin_name, array( $this, 'plugin_action_links' ) );
 		}
 
-		$this->add_notice( array( $this, 'error_notices' ) );
+		add_action( 'admin_notices', array( $this, 'error_notices' ) );
 	}
 
 	/**
@@ -212,7 +211,7 @@ class RP_Plugin_Updater {
 	 * Ran on plugin-deactivation.
 	 */
 	public function plugin_deactivation() {
-		$this->deactivate_licence();
+		$this->deactivate_license();
 	}
 
 	/**
@@ -228,7 +227,18 @@ class RP_Plugin_Updater {
 	 * Try to activate a license.
 	 */
 	public function activate_license( $license_key ) {
+		try {
 
+			if ( empty( $license_key ) ) {
+				throw new Exception( 'Please enter your license key' );
+			}
+
+			throw new Exception( 'License could not activate. Please contact support.' );
+
+		} catch ( Exception $e ) {
+			$this->add_error( $e->getMessage() );
+			return false;
+		}
 	}
 
 	/**
