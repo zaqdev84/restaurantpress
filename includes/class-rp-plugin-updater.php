@@ -121,7 +121,14 @@ class RP_Plugin_Updater {
 	 */
 	private function activate_license_request() {
 		$license_key = sanitize_text_field( $_POST[ $this->plugin_slug . '_license_key' ] );
-		$this->activate_license( $license_key );
+
+		if ( $this->activate_license( $license_key ) ) {
+			wp_redirect( remove_query_arg( array( 'deactivated_license', $this->plugin_slug . '_deactivate_license' ), add_query_arg( 'activated_license', $this->plugin_slug ) ) );
+			exit;
+		} else {
+			wp_redirect( remove_query_arg( array( 'activated_license', 'deactivated_license', $this->plugin_slug . '_deactivate_license' ) ) );
+			exit;
+		}
 	}
 
 	/**
@@ -232,7 +239,7 @@ class RP_Plugin_Updater {
 	 */
 	public function plugin_action_links( $actions ) {
 		$new_actions = array(
-			'deactivate_license' => '<a href="' . remove_query_arg( array( 'deactivated_license', 'activated_license' ), add_query_arg( $this->plugin_slug . '_deactivate_license', 1 ) ) . '" class="trash" title="' . esc_attr( __( 'Deactivate License Key', 'restaurantpress' ) ) . '">' . __( 'Deactivate License', 'restaurantpress' ) . '</a>',
+			'deactivate_license' => '<a href="' . remove_query_arg( array( 'deactivated_license', 'activated_license' ), add_query_arg( $this->plugin_slug . '_deactivate_license', 1 ) ) . '" class="deactivate-license" title="' . esc_attr( __( 'Deactivate License Key', 'restaurantpress' ) ) . '">' . __( 'Deactivate License', 'restaurantpress' ) . '</a>',
 		);
 
 		return array_merge( $actions, $new_actions );
@@ -290,9 +297,25 @@ class RP_Plugin_Updater {
 			delete_option( $this->plugin_slug . '_license_key' );
 			delete_option( $this->plugin_slug . '_errors' );
 			delete_site_transient( 'update_plugins' );
+
+			// Reset huh?
 			$this->errors  = array();
 			$this->api_key = '';
 		}
+	}
+
+	/**
+	 * Activation success notice.
+	 */
+	public function activated_key_notice() {
+		include( 'views/html-notice-key-activated.php' );
+	}
+
+	/**
+	 * Dectivation success notice.
+	 */
+	public function deactivated_key_notice() {
+		include( 'views/html-notice-key-deactivated.php' );
 	}
 
 	/**
@@ -302,13 +325,6 @@ class RP_Plugin_Updater {
 		if ( sizeof( $this->errors ) === 0 && ! get_option( $this->plugin_slug . '_hide_key_notice' ) ) {
 			include( 'views/html-notice-key-unvalidated.php' );
 		}
-	}
-
-	/**
-	 * Dectivation success notice
-	 */
-	public function deactivated_key_notice() {
-		include( 'views/html-notice-key-deactivated.php' );
 	}
 }
 
